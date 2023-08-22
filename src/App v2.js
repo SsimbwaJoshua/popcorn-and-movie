@@ -1,4 +1,4 @@
-import { Children, useEffect, useState } from "react";
+import { Children, useEffect, useState, useRef } from "react";
 import StarRating from "./StarRating";
 
 const average = (arr) =>
@@ -148,6 +148,28 @@ function NavBar({ children }) {
   );
 }
 function Search({ query, setQuery }) {
+  const inputEl = useRef(null);
+
+  useEffect(() => {
+    if (document.activeElement === inputEl) return;
+    function callBack(e) {
+      if (e.code === "Enter") {
+        inputEl.current.focus();
+        setQuery("");
+      }
+    }
+
+    document.addEventListener("keydown", callBack);
+
+    return () => document.addEventListener("keydown", callBack);
+  }, []);
+
+  // useEffect(function () {
+  //   const el = document.querySelector(".search");
+  //   console.log(el);
+  //   el.focus();
+  // }, []);
+
   return (
     <input
       className="search"
@@ -155,6 +177,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
