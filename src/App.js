@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import StarRating from "./StarRating";
 import { useMovies } from "./UseMovies";
 import { useLocalStorage } from "./UseLocalStorage";
+import { useKey } from "./useKey";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -99,19 +100,12 @@ function NavBar({ children }) {
 function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
-  useEffect(() => {
+  useKey("Enter", function () {
     if (document.activeElement === inputEl) return;
-    function callBack(e) {
-      if (e.code === "Enter") {
-        inputEl.current.focus();
-        setQuery("");
-      }
-    }
 
-    document.addEventListener("keydown", callBack);
-
-    return () => document.addEventListener("keydown", callBack);
-  }, [setQuery]);
+    inputEl.current.focus();
+    setQuery("");
+  });
 
   return (
     <input
@@ -222,22 +216,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onAddWatched(newwatchedMovie);
     onCloseMovie();
   }
-
-  useEffect(
-    function () {
-      const callBack = function (e) {
-        if (e.code === "Escape") {
-          onCloseMovie();
-        }
-      };
-      document.addEventListener("keydown", callBack);
-      return function () {
-        document.removeEventListener("keydown", callBack);
-      };
-    },
-    [onCloseMovie]
-  );
-
+  useKey("Escape", onCloseMovie);
   useEffect(
     function () {
       async function getMovieDetails() {
